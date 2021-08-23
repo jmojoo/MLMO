@@ -10,3 +10,5 @@ models/*
 
 !models/extractors
 !models/mlmo
+*__pycache__*
+*.pyc
