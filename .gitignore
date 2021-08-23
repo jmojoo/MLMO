@@ -7,8 +7,8 @@ data/INRIA_holidays
 data/cifar10
 results/*
 models/*
+*__pycache__*
+*.pyc
 
 !models/extractors
 !models/mlmo
-*__pycache__*
-*.pyc
