@@ -1,0 +1,12 @@
+captions_train2014.json
+captions_val2014.json
+instances_train2014.json
+instances_val2014.json
+data/alexnet.npz
+data/INRIA_holidays
+data/cifar10
+results/*
+models/*
+
+!models/extractors
+!models/mlmo
