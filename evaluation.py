@@ -3,17 +3,12 @@ import chainer
 import numpy as np
 import cupy
 
-from models.dtq_rn import DTQ_RN
-from models.dtq import DTQ
-from models.dtq_rn_pyramid import DTQPyramidRN
-from models.dtq_srl import DTQ_SRL
-from models.extractors import AlexNet_conv5
+from models.mlmo import MLMO
 from models.extractors import AlexNet_fc7
-from models.extractors.vgg16 import VGG16Layers
+from models.extractors import vgg16
 from utils.retrieval import mAP, WAP, mAP_at
 from utils import datasets
 from utils.multiprocess_iterator import MultiprocessIterator
-from labels import nuswide_labels
 
 from chainer.datasets import TransformDataset
 from chainer import cuda
@@ -91,10 +86,8 @@ def evaluate(q_it, db_it, q_labels, db_labels,
     d_codes = d_codes
     db_labels = db_labels
     q_labels = q_labels
-    q_codes = q_codes
 
     print("calculating mAP...", end='\r')
-
 
     if config.part == "rn":
         q_feat = q_embed[:, :half_dim]
@@ -105,9 +98,6 @@ def evaluate(q_it, db_it, q_labels, db_labels,
     else:
         q_feat = q_embed
         db_feat = db_embed
-
-        # q_feat[:, :half_dim] *= .5
-        # db_feat[:, :half_dim] *= .5
 
     mAP_feature = mAP(q_feat, q_labels,
                       db_feat, db_labels, 'inner_product', R)
@@ -122,16 +112,11 @@ def evaluate(q_it, db_it, q_labels, db_labels,
     C = model1.C.array[:, :db_embed.shape[-1]]
     if config.stage == 1:
         db_reconstr = xp.dot(d_codes, C)
-        q_reconstr = xp.dot(q_codes, C)
     else:
         C = xp.split(C, 2, axis=1)
         d_c = xp.split(d_codes, 2, axis=1)
-        q_c = xp.split(q_codes, 2, axis=1)
         db_reconstr = xp.concatenate(
             (xp.dot(d_c[0], C[0]), xp.dot(d_c[1], C[1])), axis=1
-        )
-        q_reconstr = xp.concatenate(
-            (xp.dot(q_c[0], C[0]), xp.dot(q_c[1], C[1])), axis=1
         )
 
     if config.stage == 2:
@@ -182,13 +167,11 @@ def main():
 
     config1.part = args.part
 
-    extractors = {'alexnet_conv5': AlexNet_conv5,
-                  'alexnet_fc7': AlexNet_fc7,
-                  'vgg16': VGG16Layers}
-    models = {'dtq': DTQ, 'dtq_rn': DTQ_RN, 'dtq_prn': DTQPyramidRN, 'dtq_srl': DTQ_SRL}
+    extractors = {'alexnet_fc7': AlexNet_fc7,
+                  'vgg16': vgg16}
+    models = {'mlmo': MLMO}
     dset = {'nuswide': datasets.nuswide, 'nuswide_21': datasets.nuswide_21,
-            'coco': datasets.coco, 'cifar10': datasets.cifar10,
-            'holidays': datasets.holidays}
+            'coco': datasets.coco}
     extractor1 = extractors[config1.extractor]()
 
     model1 = models[config1.model](extractor1, config1)
