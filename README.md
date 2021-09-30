@@ -17,5 +17,10 @@ If you use this code in your research, please cite:
   pages={873--880},
   year={2021},
   publisher={The Institute of Electronics, Information and Communication Engineers}
-},
+}
 ```
+
+## Setup
+* Install Chainer with CuPy (For GPU support)
+* Put the path to your image data in ```./data/<dataset-name>/data-dir.txt```
+* Download pre-trained weights in ```.npz``` format
