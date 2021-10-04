@@ -16,7 +16,7 @@ from utils.multiprocess_iterator import MultiprocessIterator
 import json
 
 from models.mlmo import MLMO
-from models.extractors import AlexNet_fc7
+from models.extractors import AlexNet
 from models.extractors import vgg16
 from utils import datasets
 from utils.extensions import UpdateTrainData
@@ -52,12 +52,12 @@ def main():
     parser.add_argument('--train-batchsize', type=int, default=128)
     parser.add_argument('--val-batchsize', type=int, default=16)
     parser.add_argument('--epoch', type=int, default=80)
-    parser.add_argument('--step', type=int, nargs='*', default=[30000, 60000])
+    parser.add_argument('--steps', type=int, nargs='*', default=[30000, 60000])
     parser.add_argument('--gpu', type=int, default=1)
-    parser.add_argument('--model', choices=('mlmo'), default='mlmo')
+    parser.add_argument('--model', choices=('mlmo',), default='mlmo')
     parser.add_argument('--out', default=None)
     parser.add_argument('--resume', default=None)
-    parser.add_argument('--extractor', choices=('alexnet_fc7', 'vgg16'))
+    parser.add_argument('--extractor', choices=('alexnet', 'vgg16'))
     parser.add_argument('--dataset', choices=('cifar10','nuswide', 'coco', 'nuswide_21'))
     parser.add_argument('--trainstage', choices=('val', 'final'), default='final')
     parser.add_argument('--pretrained', type=str, default=None)
@@ -80,12 +80,10 @@ def main():
     parser.add_argument('--weight-decay', default=0.0005, type=float)
     args = parser.parse_args()
 
-    settings.init(nh=args.nh_size)
-
-    extractors = {'alexnet_fc7': AlexNet_fc7,
+    extractors = {'alexnet': AlexNet,
                   'vgg16': vgg16}
     models = {'mlmo': MLMO}
-    dset = {'nuswide': datasets.nuswide, 'nuswide_21': datasets.nuswide_21_full, 'coco': datasets.coco, }
+    dset = {'nuswide': datasets.nuswide, 'nuswide_21': datasets.nuswide_21, 'coco': datasets.coco, }
     Rs = {'cifar10': 54000, 'nuswide': 5000, 'nuswide_21': 5000, 'coco': 5000}
     # nuswide 21 is the version of NUSWIDE with oly 21 most common classes
     args.R = Rs[args.dataset]
@@ -121,7 +119,7 @@ def main():
         code_dim = 2 * args.subspace * args.subcenter
         embed_dim = args.output_dim
 
-    data = dset[args.dataset](args.gamma)
+    data = dset[args.dataset]()
 
     if args.trainstage == 'val':
         # split train data into train and val
@@ -184,12 +182,8 @@ def main():
         database_img, args.val_batchsize, repeat=False, n_prefetch=2,
         shuffle=False)
 
-    if args.multigpu:
-        updater = training.updaters.ParallelUpdater(
-            train_iter, optimizer, devices={'main': args.gpu, 'second': 1})
-    else:
-        updater = training.updaters.StandardUpdater(
-            train_iter, optimizer, device=args.gpu)
+    updater = training.updaters.StandardUpdater(
+        train_iter, optimizer, device=args.gpu)
     trainer = training.Trainer(
         updater, (args.epoch, 'epoch'), args.out)
 
