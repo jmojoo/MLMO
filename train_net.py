@@ -9,10 +9,9 @@ from chainer import serializers
 from chainer import training
 from chainer.training import extensions
 from utils.retrieval import RetrievalEvaluator
-from utils.triplet_sampling import TripletDataset, SLTripletDataset2
+from utils.triplet_sampling import TripletDataset
 from utils.momentum_sgd import MomentumSGD
 from utils.multiprocess_iterator import MultiprocessIterator
-from utils import settings
 
 import json
 

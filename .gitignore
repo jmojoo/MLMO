@@ -6,9 +6,8 @@ data/alexnet.npz
 data/INRIA_holidays
 data/cifar10
 results/*
-models/*
 *__pycache__*
 *.pyc
-
+utils/vae_evaluate.py
 !models/extractors
 !models/mlmo
