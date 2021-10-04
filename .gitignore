@@ -11,3 +11,4 @@ results/*
 utils/vae_evaluate.py
 !models/extractors
 !models/mlmo
+.idea/*
