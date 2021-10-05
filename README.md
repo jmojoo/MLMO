@@ -24,3 +24,9 @@ If you use this code in your research, please cite:
 * Install Chainer with CuPy (For GPU support)
 * Put the path to your image data in ```./data/<dataset-name>/data-dir.txt```
 * Download pre-trained weights in ```.npz``` format
+
+## Training
+### NUSWIDE
+* ```python train_net.py --dataset nuswide --extractor alexnet --pretrained <path-to-pretrained-model> --gpu 0 --out results/nuswide --stage 2```
+### MSCOCO (with VGG-16)
+* ```python train_net.py --dataset nuswide --extractor vgg16 --gpu 0 --out results/nuswide --stage 2```
