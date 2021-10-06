@@ -155,10 +155,10 @@ def main():
         query_label = xp.array(data['queries/label'], dtype=np.int32)
 
         database_img = TransformDataset(
-            data['database/img'],
+            data['database/img'][:5000],
             Transform(args, ensemble=True)
         )
-        database_label = xp.array(data['database/label'], dtype=np.int32)
+        database_label = xp.array(data['database/label'], dtype=np.int32)[:5000]
 
     train_codes = np.zeros((len(train_label), code_dim), dtype=np.float32)
     train_embed = np.zeros((len(train_label), embed_dim), dtype=np.float32)
@@ -202,7 +202,7 @@ def main():
         RetrievalEvaluator(query_iter, query_codes, query_label,
                            db_iter, database_codes, database_label,
                            model, args, device=args.gpu),
-        trigger=(40, 'epoch'))
+        trigger=(5, 'iteration'))
 
     trainer.extend(
         UpdateTrainData(train_iter, model, train_img,

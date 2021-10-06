@@ -213,11 +213,12 @@ def mAP(q_vectors, q_labels, db_vectors, db_labels, dist_func, R):
         if rel != 0:
             AP = xp.sum(
                 cut_off_precision * indicator) / rel
-            APs.append(AP)
+            APs.append(AP.astype(xp.float32))
 
     del positions
 
-    return np.mean(xp.array(APs).get())
+    APs = xp.asarray(APs, dtype=xp.float32)
+    return np.mean(APs.get())
 
 
 def mAP_at(q_vectors, q_labels, db_vectors, db_labels, dist_func, R, thresh):
@@ -248,8 +249,8 @@ def mAP_at(q_vectors, q_labels, db_vectors, db_labels, dist_func, R, thresh):
             APs.append(AP)
 
     del positions
-
-    return np.mean(xp.array(APs).get())
+    APs = xp.asarray(APs, dtype=xp.float32)
+    return np.mean(APs.get())
 
 
 def WAP(q_vectors, q_labels, db_vectors, db_labels, dist_func, R):
@@ -280,8 +281,8 @@ def WAP(q_vectors, q_labels, db_vectors, db_labels, dist_func, R):
             APs.append(AP)
 
     del positions
-
-    return np.mean(xp.array(APs).get())
+    APs = xp.asarray(APs, dtype=xp.float32)
+    return np.mean(APs.get())
 
 
 def distance(backend, x, y=None, pair=False, dist_func='inner_product'):
